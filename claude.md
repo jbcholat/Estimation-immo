@@ -1,145 +1,84 @@
-# Analyse Immobilière - Documentation pour Claude
+# Estimateur Immobilier Automatisé - MVP Chablais/Annemasse
 
-## 🏢 Contexte Projet
-- **Projet**: Application d'estimation immobilière pour la Haute-Savoie (74)
-- **Objectif**: Fournir des estimations immobilières fiables basées sur données DV3F et connaissances locales
-- **Stack**: Python (Streamlit), Pandas, Plotly, Geolocalisation
-- **Région Focus**: Haute-Savoie - communes comme Thonon-les-Bains, Evian, Annecy, etc.
+## 🎯 Mission
+Réduire temps estimation de 50% (4-6h → 2-3h) zone Chablais/Annemasse, Haute-Savoie (74)
 
-## 🔧 Commandes Essentielles
+## 📊 Contexte
+- **Utilisateurs** : Vous + Madame CHOLAT (tests internes)
+- **Zone géo** : Codes postaux 740xx, 742xx, 743xx (Chablais, Annemasse, Stations)
+- **Données** : DVF+ PostgreSQL (Supabase)
+- **Timeline** : MVP 7-10h développement
 
+## 🛠️ Stack Technique
+- **DB** : Supabase (PostgreSQL + PostGIS)
+- **Frontend** : Streamlit → Vercel
+- **Géocodage** : Google Maps Geocoding API
+- **Cartes** : Folium (OpenStreetMap)
+- **Export** : PDF simple (ReportLab)
+- **Framework** : Compound Engineering
+
+## 🤖 5 Agents Spécialisés
+
+| Agent | Rôle | Focus |
+|-------|------|-------|
+| **supabase-data-agent** | DB + requêtes | PostgreSQL/PostGIS/Supabase (Phase 2) |
+| **streamlit-mvp-agent** | Interface | Streamlit/Folium/Google Maps (Phase 4) |
+| **estimation-algo-agent** | Algorithmes | Scoring/Estimation/Confiance (Phase 3) |
+| **testing-agent** | Tests | Validation/QA (Phase 5) |
+| **docs-agent** | Documentation | Docs techniques (Phase 5) |
+
+👉 **Voir `.claude/agents/<agent-name>.json` pour détails**
+
+## 📁 Structure Clés
+```
+src/
+  ├── supabase_data_retriever.py      # DB requêtes
+  ├── estimation_algorithm.py          # Scoring/estimation
+  ├── streamlit_components/            # Composants UI
+  └── utils/geocoding.py               # Google Maps wrapper
+
+app.py                                  # Streamlit principal
+```
+
+## 🔐 Configuration (.env)
+```
+SUPABASE_URL=https://fwcuftkjofoxyjbjzdnh.supabase.co
+SUPABASE_KEY=<votre-clé>
+GOOGLE_MAPS_API_KEY=AIzaSyBdwqhBKgOwi6kHejyhFFw8QluV4pkpwQE
+```
+
+## 📚 Documentation Complète
+- 🔥 **Plan MVP** : @docs/PLAN_MVP_IMPLEMENTATION.md ← CHARGER DEMAIN
+- **Contexte** : @docs/CONTEXT_PROJET.md
+- **Agents** : @docs/AGENTS_GUIDE.md
+- **Setup Supabase** : @docs/SETUP_SUPABASE.md
+- **Google Maps** : @docs/GOOGLE_MAPS_SETUP.md
+- **PRD Notion** : https://www.notion.so/Automatisation-des-estimations-2fc6cfd339504d1bbf444c0ae078ff5c
+
+## 🚀 Quick Start (Demain)
 ```bash
-# Lancer l'application
-streamlit run app.py
+# 1. Charger plan
+# "Charge docs/PLAN_MVP_IMPLEMENTATION.md"
 
-# Développement
-python -m pytest tests/
+# 2. Phase 1-5 développement
+# Phase 1: Setup agents (1-2h)
+# Phase 2: Supabase [supabase-data-agent] (2-3h)
+# Phase 3: Algo [estimation-algo-agent] (2-3h)
+# Phase 4: Streamlit [streamlit-mvp-agent] (3-4h)
+# Phase 5: Tests [testing-agent] (1-2h)
 
-# Linter/Format
-black src/
-ruff check src/
-
-# Installation dépendances
-pip install -r requirements.txt
+# 3. Tests utilisateurs (Vous + Madame)
+# 10-20 estimations réelles zone Chablais
 ```
 
-## 📁 Structure du Projet
-
-```
-analyse_immobiliere/
-├── app.py                          # Streamlit main app
-├── requirements.txt                # Dependencies
-├── src/
-│   ├── data_processing.py         # Chargement et préparation données DV3F
-│   ├── geocoding.py               # Géocodage adresses
-│   ├── comparable_finder.py       # Logique recherche biens comparables
-│   ├── estimation_engine.py       # Moteur calcul estimation
-│   └── utils/                     # Utilitaires (formatage, validation)
-├── data/                          # Données DV3F (si local)
-├── tests/                         # Suite de tests
-├── docs/                          # Documentation
-│   ├── architecture.md            # Architecture application
-│   ├── specifications.md          # Spécifications fonctionnelles
-│   ├── data-model.md             # Modèle de données
-│   └── notion-export/            # Export Notion (User Stories, EPICs)
-└── .claude/                       # Configuration Claude
-```
-
-## 💡 Conventions de Code
-
-**Python :**
-- Format: Black (line length: 100)
-- Linter: Ruff
-- Type hints obligatoires pour fonctions publiques
-- Docstrings: Google style
-- Exemple:
-  ```python
-  def estimate_property(comparables: pd.DataFrame, surface: float) -> dict:
-      """Calculate property estimation based on comparables.
-
-      Args:
-          comparables: DataFrame with comparable properties
-          surface: Target property surface in m²
-
-      Returns:
-          Dictionary with estimation metrics
-      """
-  ```
-
-**Git :**
-- Branches: `feature/xxx`, `fix/xxx`, `docs/xxx`
-- Commits: Conventional commits (feat:, fix:, docs:, etc.)
-- PR required pour main
-
-## 🏗️ Architecture Patterns
-
-**Data Flow :**
-1. Utilisateur entre adresse → Géocodage
-2. Recherche comparables (radius, surface, type, ancienneté)
-3. Calcul scores de pertinence
-4. Estimation prix (médiane, quartiles)
-5. Affichage résultats + visualisations
-
-**État Session Streamlit :**
-- `st.session_state.coords` : Coordonnées géocodées
-- `st.session_state.address` : Adresse saisie
-- `st.session_state.last_estimation` : Dernière estimation calculée
-
-**Données Clés :**
-- Source: DV3F (Cerema) - transactions immobilières
-- Colonnes principales: `datemut`, `valeurfonc`, `sbati`, `type_detail`, coordonnées
-- Calculs: `prix_m2`, `distance_km`, `score_total`
-
-## 📊 Workflows Principaux
-
-### WF1: Estimation Immobilière
-```
-Input: Adresse, type bien, surface, ancienneté
-↓ Géocodage
-↓ Recherche comparables (rayon, tolerance surface)
-↓ Scoring (proximité, ancienneté, type)
-↓ Calcul médiane/quartiles
-Output: Estimation + confiance + visualisations
-```
-
-### WF2: Paramétrage Recherche
-```
-Sidebar parameters:
-- Rayon recherche max (3-20 km)
-- Ancienneté max (6-36 mois)
-- Tolérance surface (10-50%)
-```
-
-## 🧪 Tests Obligatoires
-
-- Tests unitaires: `tests/unit/`
-- Tests intégration: `tests/integration/`
-- Données test: `tests/fixtures/`
-- Coverage minimum: 80%
-
-```bash
-pytest tests/ -v --cov=src/
-```
-
-## 📝 À Compléter
-
-Ces sections seront détaillées après exploration Notion :
-- [ ] Specifications fonctionnelles détaillées (User Stories)
-- [ ] EPICs et roadmap
-- [ ] Modèle données précis
-- [ ] Business rules Haute-Savoie
-- [ ] Intégrations externes requises
-
-**Action**: Exporter les pages Notion (User Stories, EPICs, Documents) en Markdown pour fusion dans `docs/`.
-
-## 🔗 Références Documentation
-
-- @docs/architecture.md (à créer)
-- @docs/specifications.md (à créer)
-- @docs/data-model.md (à créer)
-- Notion Export: @docs/notion-export/ (en attente)
+## 💡 Notes
+- ✅ Tout documenté pour redémarrage facile
+- ✅ Agents réduisent context window 80%
+- ✅ Infrastructure cloud (0€ plans gratuits)
+- ✅ MVP complet demain
 
 ---
 
-**Dernière mise à jour**: 2025-10-17
-**Responsable**: Jean-Baptiste CHOLAT
+**Statut** : Prêt démarrage demain 🚀
+**Dernière mise à jour** : 2025-10-18
+**Équipe** : Jean-Baptiste + Madame CHOLAT

@@ -1,0 +1,27 @@
+{
+  "buildCommand": "pip install -r requirements.txt",
+  "outputDirectory": ".",
+  "devCommand": "streamlit run app.py",
+  "framework": "streamlit",
+  "projectSettings": {
+    "sourceFilesOutsideRootDirectory": true
+  },
+  "env": {
+    "SUPABASE_URL": "@SUPABASE_URL",
+    "SUPABASE_KEY": "@SUPABASE_KEY",
+    "GOOGLE_MAPS_API_KEY": "@GOOGLE_MAPS_API_KEY"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    }
+  ],
+  "redirects": [],
+  "rewrites": []
+}
