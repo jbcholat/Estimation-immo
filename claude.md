@@ -39,11 +39,14 @@ app.py                                # Phase 4: Streamlit principal
 ```
 
 ## 🚀 Timeline
-- Phase 1 (1-2h) : Setup agents + infrastructure ✅
-- Phase 2 (2-3h) : Supabase + requêtes DVF+
-- Phase 3 (2-3h) : Algorithmes estimation
-- Phase 4 (3-4h) : Interface Streamlit MVP
-- Phase 5 (1-2h) : Tests + validation
+- Phase 1 (1-2h) : Setup agents + infrastructure ✅ (d7dde1a)
+- Phase 2 (2-3h) : Supabase + requêtes DVF+ ✅ (d6ebd49)
+  - 145,000 mutations importées
+  - SupabaseDataRetriever opérationnel
+  - 5/5 tests passants
+- Phase 3 (2-3h) : Algorithmes estimation ⏳
+- Phase 4 (3-4h) : Interface Streamlit MVP ⏳
+- Phase 5 (1-2h) : Tests + validation ⏳
 
 ## 📞 Contacts
 - **PRD Notion** : https://www.notion.so/Automatisation-des-estimations-2fc6cfd339504d1bbf444c0ae078ff5c
@@ -52,5 +55,5 @@ app.py                                # Phase 4: Streamlit principal
 
 ---
 
-**Statut Phase 1** : ✅ Setup complet
-**Prochaine étape** : Phase 2 avec `supabase-data-agent`
+**Statut Phase 2** : ✅ Supabase + DVF+ complétée
+**Prochaine étape** : Phase 3 avec `estimation-algo-agent`
