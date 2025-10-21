@@ -1,84 +1,56 @@
-# Estimateur Immobilier Automatisé - MVP Chablais/Annemasse
+# Estimateur Immobilier MVP - Chablais/Annemasse
 
 ## 🎯 Mission
-Réduire temps estimation de 50% (4-6h → 2-3h) zone Chablais/Annemasse, Haute-Savoie (74)
+Réduire temps d'estimation immobilière de 50% (4-6h → 2-3h)
+Zone : Chablais/Annemasse, Haute-Savoie codes postaux 740xx/742xx/743xx
 
-## 📊 Contexte
-- **Utilisateurs** : Vous + Madame CHOLAT (tests internes)
-- **Zone géo** : Codes postaux 740xx, 742xx, 743xx (Chablais, Annemasse, Stations)
-- **Données** : DVF+ PostgreSQL (Supabase)
-- **Timeline** : MVP 7-10h développement
-
-## 🛠️ Stack Technique
+## 🛠️ Stack
 - **DB** : Supabase (PostgreSQL + PostGIS)
-- **Frontend** : Streamlit → Vercel
-- **Géocodage** : Google Maps Geocoding API
-- **Cartes** : Folium (OpenStreetMap)
-- **Export** : PDF simple (ReportLab)
-- **Framework** : Compound Engineering
+- **Frontend** : Streamlit + Folium + Plotly
+- **APIs** : Google Maps Geocoding
+- **Export** : PDF (ReportLab)
+- **Infrastructure** : Vercel + GitHub
 
-## 🤖 5 Agents Spécialisés
+## 🤖 5 Agents Spécialisés (Phase 2-5)
 
-| Agent | Rôle | Focus |
-|-------|------|-------|
-| **supabase-data-agent** | DB + requêtes | PostgreSQL/PostGIS/Supabase (Phase 2) |
-| **streamlit-mvp-agent** | Interface | Streamlit/Folium/Google Maps (Phase 4) |
-| **estimation-algo-agent** | Algorithmes | Scoring/Estimation/Confiance (Phase 3) |
-| **testing-agent** | Tests | Validation/QA (Phase 5) |
-| **docs-agent** | Documentation | Docs techniques (Phase 5) |
+| Agent | Phase | Durée | Focus |
+|-------|-------|-------|-------|
+| `supabase-data-agent` | 2 | 2-3h | PostgreSQL/PostGIS + DVF+ |
+| `estimation-algo-agent` | 3 | 2-3h | Scoring + estimation |
+| `streamlit-mvp-agent` | 4 | 3-4h | Interface Streamlit |
+| `testing-agent` | 5 | 1-2h | Tests + validation |
+| `docs-agent` | 5 | 1-2h | Documentation |
 
-👉 **Voir `.claude/agents/<agent-name>.json` pour détails**
+## 📚 Documentation
+- **Plan Implémentation** : `docs/PLAN_MVP_IMPLEMENTATION.md`
+- **Agents Guide** : `docs/AGENTS_GUIDE.md`
+- **Setup Supabase** : `docs/SETUP_SUPABASE.md`
+- **Google Maps** : `docs/GOOGLE_MAPS_SETUP.md`
+- **Requirements** : `docs/MVP_REQUIREMENTS.md`
+- **Contexte** : `docs/CONTEXT_PROJET.md`
 
-## 📁 Structure Clés
+## 📁 Structure
 ```
-src/
-  ├── supabase_data_retriever.py      # DB requêtes
-  ├── estimation_algorithm.py          # Scoring/estimation
-  ├── streamlit_components/            # Composants UI
-  └── utils/geocoding.py               # Google Maps wrapper
-
-app.py                                  # Streamlit principal
-```
-
-## 🔐 Configuration (.env)
-```
-SUPABASE_URL=https://fwcuftkjofoxyjbjzdnh.supabase.co
-SUPABASE_KEY=<votre-clé>
-GOOGLE_MAPS_API_KEY=AIzaSyBdwqhBKgOwi6kHejyhFFw8QluV4pkpwQE
+src/supabase_data_retriever.py       # Phase 2: DB requêtes
+src/estimation_algorithm.py           # Phase 3: Scoring/estimation
+src/streamlit_components/             # Phase 4: UI composants
+src/utils/geocoding.py                # Phase 4: Google Maps wrapper
+app.py                                # Phase 4: Streamlit principal
 ```
 
-## 📚 Documentation Complète
-- 🔥 **Plan MVP** : @docs/PLAN_MVP_IMPLEMENTATION.md ← CHARGER DEMAIN
-- **Contexte** : @docs/CONTEXT_PROJET.md
-- **Agents** : @docs/AGENTS_GUIDE.md
-- **Setup Supabase** : @docs/SETUP_SUPABASE.md
-- **Google Maps** : @docs/GOOGLE_MAPS_SETUP.md
+## 🚀 Timeline
+- Phase 1 (1-2h) : Setup agents + infrastructure ✅
+- Phase 2 (2-3h) : Supabase + requêtes DVF+
+- Phase 3 (2-3h) : Algorithmes estimation
+- Phase 4 (3-4h) : Interface Streamlit MVP
+- Phase 5 (1-2h) : Tests + validation
+
+## 📞 Contacts
 - **PRD Notion** : https://www.notion.so/Automatisation-des-estimations-2fc6cfd339504d1bbf444c0ae078ff5c
-
-## 🚀 Quick Start (Demain)
-```bash
-# 1. Charger plan
-# "Charge docs/PLAN_MVP_IMPLEMENTATION.md"
-
-# 2. Phase 1-5 développement
-# Phase 1: Setup agents (1-2h)
-# Phase 2: Supabase [supabase-data-agent] (2-3h)
-# Phase 3: Algo [estimation-algo-agent] (2-3h)
-# Phase 4: Streamlit [streamlit-mvp-agent] (3-4h)
-# Phase 5: Tests [testing-agent] (1-2h)
-
-# 3. Tests utilisateurs (Vous + Madame)
-# 10-20 estimations réelles zone Chablais
-```
-
-## 💡 Notes
-- ✅ Tout documenté pour redémarrage facile
-- ✅ Agents réduisent context window 80%
-- ✅ Infrastructure cloud (0€ plans gratuits)
-- ✅ MVP complet demain
+- **Config** : `.env.example` (copier en `.env`)
+- **Agents** : Voir `.claude/agents/` pour détails MCPs
 
 ---
 
-**Statut** : Prêt démarrage demain 🚀
-**Dernière mise à jour** : 2025-10-18
-**Équipe** : Jean-Baptiste + Madame CHOLAT
+**Statut Phase 1** : ✅ Setup complet
+**Prochaine étape** : Phase 2 avec `supabase-data-agent`
