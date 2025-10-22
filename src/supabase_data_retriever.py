@@ -65,8 +65,10 @@ class SupabaseDataRetriever:
                         sbati,
                         coddep,
                         libnatmut,
-                        nblocmut
-                    FROM dvf.mutations
+                        nblocmut,
+                        latitude,
+                        longitude
+                    FROM dvf.mutations_complete
                     WHERE sbati >= :surface_min
                       AND sbati <= :surface_max
                       AND valeurfonc > 0
