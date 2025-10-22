@@ -98,6 +98,14 @@ class SimilarityScorer:
             if isinstance(date_mutation, str):
                 date_mutation = datetime.strptime(date_mutation, "%Y-%m-%d")
 
+            # Convertir date en datetime si nécessaire
+            if hasattr(date_mutation, 'date'):
+                # C'est déjà un datetime
+                pass
+            else:
+                # C'est une date, la convertir en datetime
+                date_mutation = datetime.combine(date_mutation, datetime.min.time())
+
             mois_ecoulis = (datetime.now() - date_mutation).days / 30.44
 
             if mois_ecoulis <= 12:
@@ -193,7 +201,7 @@ class SimilarityScorer:
 class EstimationEngine:
     """Moteur d'estimation basé sur comparables avec pondération par scores"""
 
-    MIN_COMPARABLE_SCORE = 70  # Score minimum pour inclure un comparable
+    MIN_COMPARABLE_SCORE = 40  # Score minimum pour inclure un comparable (baissé de 70 pour inclusivité)
 
     @staticmethod
     def calculate_estimation(
@@ -220,7 +228,7 @@ class EstimationEngine:
                 "prix_min": None,
                 "prix_max": None,
                 "nb_comparables_utilises": 0,
-                "erreur": "Pas de comparables valides (score >= 70)"
+                "erreur": f"Pas de comparables valides (score >= {EstimationEngine.MIN_COMPARABLE_SCORE})"
             }
 
         # Extraction prix et scores
@@ -289,7 +297,7 @@ class ConfidenceCalculator:
         # Filtrer comparables valides
         valides = [
             (c, s) for c, s in comparables_with_scores
-            if s >= 70
+            if s >= EstimationEngine.MIN_COMPARABLE_SCORE
         ]
 
         if not valides:

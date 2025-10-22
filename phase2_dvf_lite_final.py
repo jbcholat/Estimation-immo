@@ -71,7 +71,7 @@ try:
 
     print("\n3. Transformer + insérer données (batch)...")
 
-    df['datemut'] = pd.to_datetime(df['datemut'], format='%d/%m/%Y', errors='coerce')
+    df['datemut'] = pd.to_datetime(df['datemut'], format='%Y-%m-%d', errors='coerce')
     df['valeurfonc'] = pd.to_numeric(df['valeurfonc'], errors='coerce')
     df['sbati'] = pd.to_numeric(df['sbati'], errors='coerce')
     df['annee_mutation'] = df['datemut'].dt.year
@@ -81,27 +81,44 @@ try:
     df['type_bien'] = df['nbapt2pp'].apply(lambda x: 'Appartement' if x > 0 else 'Maison')
     df['nbpieces'] = (df['nbapt1pp'].fillna(0) + df['nbapt2pp'].fillna(0)).astype(int)
 
-    # Insert par batches
-    from io import StringIO
-    buffer = StringIO()
-    for _, row in df.iterrows():
-        vals = (
-            row['idmutation'], row['datemut'], row['valeurfonc'], row['sbati'],
-            row['nblocmut'], str(row['coddep'])[:3], str(row['libnatmut'])[:200],
-            row['latitude'], row['longitude'], row['nbpieces'],
-            row['type_bien'], row['prix_au_m2'], row['annee_mutation']
-        )
-        buffer.write('\t'.join([str(v) if v is not None else '\\N' for v in vals]) + '\n')
+    # Filtrer les lignes avec datemut valide
+    initial_len = len(df)
+    df = df[df['datemut'].notna()]
+    print(f"   ℹ️  Filtré de {initial_len} à {len(df)} lignes (dates invalides exclues)")
 
-    buffer.seek(0)
-    cursor.copy_from(buffer, 'dvf.mutations_complete',
-        columns=['idmutation', 'datemut', 'valeurfonc', 'sbati', 'nblocmut', 'coddep', 'libnatmut',
-                 'latitude', 'longitude', 'nbpieces', 'type_bien', 'prix_au_m2', 'annee_mutation'])
-    conn.commit()
-    print(f"   ✅ Inséré via COPY")
-    cursor.execute("SELECT COUNT(*) FROM dvf.mutations_complete")
-    total = cursor.fetchone()[0]
-    print(f"   ✅ {total} mutations importées")
+    # Insert par batches (batch insert pour performance)
+    batch_size = 1000
+    total_inserted = 0
+
+    for i in range(0, len(df), batch_size):
+        batch = df.iloc[i:i+batch_size]
+        values = []
+        for _, row in batch.iterrows():
+            values.append((
+                row['idmutation'], row['datemut'], row['valeurfonc'], row['sbati'],
+                row['nblocmut'], str(row['coddep'])[:3], str(row['libnatmut'])[:200],
+                row['latitude'], row['longitude'], row['nbpieces'],
+                row['type_bien'], row['prix_au_m2'], row['annee_mutation']
+            ))
+
+        # Multi-insert
+        placeholders = ','.join(['(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'] * len(values))
+        flat_values = [item for sublist in values for item in sublist]
+
+        query = f"""
+            INSERT INTO dvf.mutations_complete
+            (idmutation, datemut, valeurfonc, sbati, nblocmut, coddep, libnatmut,
+             latitude, longitude, nbpieces, type_bien, prix_au_m2, annee_mutation)
+            VALUES {placeholders}
+            ON CONFLICT (idmutation) DO NOTHING
+        """
+        cursor.execute(query, flat_values)
+        conn.commit()
+        total_inserted += len(values)
+        if i % 5000 == 0:
+            print(f"   ... {total_inserted}/{len(df)} lignes insérées")
+
+    print(f"   ✅ {total_inserted} mutations importées")
 
     print("\n4. Créer index critiques...")
     cursor.execute("""
@@ -129,8 +146,11 @@ try:
     conn.commit()
     print("   ✅ Vue enrichie créée")
 
+    cursor.execute("SELECT COUNT(*) FROM dvf.mutations_complete")
+    final_count = cursor.fetchone()[0]
+
     print("\n✅ PHASE 2 CORRECTION COMPLETEE!")
-    print(f"   - {total} mutations opérationnelles")
+    print(f"   - {final_count} mutations opérationnelles")
     print(f"   - Colonnes critiques ajoutées")
     print(f"   - Vue v_mutations_chablais prête")
 

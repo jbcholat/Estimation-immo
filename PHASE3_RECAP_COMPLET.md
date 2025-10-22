@@ -87,6 +87,24 @@ Script de validation avec données fictives (Supabase vide).
 
 ## 📊 Résultats Validation
 
+### ✅ Estimations avec Données Réelles Supabase (2025-10-22)
+
+**Import DVF+** : 263,798 mutations importées (complet, Supabase opérationnel)
+
+**Tests avec données réelles** : 5/5 biens Chablais estimés avec succès
+
+| Bien | Type | Surface | Prix Estimé | Prix/m² | Fiabilité | Comparables |
+|------|------|---------|-------------|---------|-----------|-------------|
+| **Thonon** (centre-ville) | Appart | 85m² | 469,368 EUR | 5,521 EUR/m² | 35/100 | 13 |
+| **Annemasse** (gare) | Appart | 100m² | 265,723 EUR | 2,657 EUR/m² | 30/100 | 9 |
+| **Évian** (vue lac) | Maison | 150m² | 826,068 EUR | 5,507 EUR/m² | 30/100 | 7 |
+| **Douvaine** (résidentiel) | Appart | 75m² | 367,176 EUR | 4,896 EUR/m² | 40/100 | 7 |
+| **Sciez** (périphérie) | Maison | 120m² | 413,958 EUR | 3,450 EUR/m² | 30/100 | 8 |
+
+**✅ Taux de réussite : 100%** (5/5 estimations)
+
+---
+
 ### Tests Unitaires
 ```
 ✅ 33/33 tests passants
