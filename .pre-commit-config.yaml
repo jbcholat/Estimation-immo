@@ -1,0 +1,91 @@
+# Pre-commit hooks configuration for secret detection and code quality
+# Install: pip install pre-commit
+# Setup: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # ==================== SECRET DETECTION ====================
+
+  # 1. Detect-secrets: Advanced pattern-based secret detection
+  # Detects: API keys, tokens, passwords, AWS keys, Google keys, etc.
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args:
+          - '--baseline'
+          - '.secrets.baseline'
+        exclude: '^\.git/|\.venv/|venv_immobilier/'
+        types: [text]
+
+  # 2. Private key detector: Detects SSH/PGP private keys
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: detect-private-key
+        exclude: '^\.git/|\.venv/|venv_immobilier/'
+
+  # ==================== CODE QUALITY ====================
+
+  # 3. Basic commit checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-yaml
+        args: ['--unsafe']
+      - id: check-json
+      - id: check-merge-conflict
+      - id: trailing-whitespace
+        exclude: '^\.git/'
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # 4. Python code quality
+  - repo: https://github.com/psf/black
+    rev: 23.9.1
+    hooks:
+      - id: black
+        language_version: python3
+        exclude: '^\.git/|\.venv/|venv_immobilier/'
+
+  # 5. Python linting
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        args:
+          - '--max-line-length=120'
+          - '--extend-ignore=E203,W503'
+        exclude: '^\.git/|\.venv/|venv_immobilier/|docs/'
+
+  # ==================== FILE CHECKS ====================
+
+  # 6. Prevent .env files from being committed
+  - repo: local
+    hooks:
+      - id: no-env-files
+        name: Prevent .env files from being committed
+        entry: 'bash -c "if [[ $@ =~ \.env([^.]|$) ]]; then echo \"ERROR: .env files should not be committed. Use .env.local instead.\"; exit 1; fi"'
+        language: system
+        stages: [commit]
+        types: [file]
+
+      - id: no-claude-config
+        name: Prevent claude_desktop_config.json with secrets
+        entry: 'bash -c "if grep -l \"GROK_API_KEY\|SUPABASE_KEY\|GOOGLE_MAPS\" \"$@\"; then echo \"ERROR: claude_desktop_config.json contains secrets. Use environment variables instead.\"; exit 1; fi"'
+        language: system
+        stages: [commit]
+        types: [file]
+        files: 'claude_desktop_config\.json'
+
+# ==================== CONFIGURATION ====================
+
+# Don't run on initial commit setup (usually large files)
+default_stages: [commit]
+
+# Fail if any hook fails
+fail_fast: false
+
+# Show timing information
+verbose: true
