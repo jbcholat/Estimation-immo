@@ -1,59 +1,59 @@
 # Estimateur Immobilier MVP - Chablais/Annemasse
 
 ## 🎯 Mission
-Réduire temps d'estimation immobilière de 50% (4-6h → 2-3h)
-Zone : Chablais/Annemasse, Haute-Savoie codes postaux 740xx/742xx/743xx
+Réduire temps estimation immobilière 50% (4-6h → 2-3h) zone Chablais/Annemasse (74).
 
 ## 🛠️ Stack
-- **DB** : Supabase (PostgreSQL + PostGIS)
-- **Frontend** : Streamlit + Folium + Plotly
-- **APIs** : Google Maps Geocoding
-- **Export** : PDF (ReportLab)
-- **Infrastructure** : Vercel + GitHub
+Supabase (PostgreSQL+PostGIS) | Streamlit+Folium+Plotly | Google Maps API | ReportLab | Vercel
 
-## 🤖 5 Agents Spécialisés (Phase 2-5)
+## ⚡ Commandes Bash Courantes
+```bash
+# Python backend
+python -m pytest tests/ -v --cov=src/
+python src/supabase_data_retriever.py
+python src/estimation_algorithm.py
 
-| Agent | Phase | Durée | Focus |
-|-------|-------|-------|-------|
-| `supabase-data-agent` | 2 | 2-3h | PostgreSQL/PostGIS + DVF+ |
-| `estimation-algo-agent` | 3 | 2-3h | Scoring + estimation |
-| `streamlit-mvp-agent` | 4 | 3-4h | Interface Streamlit |
-| `testing-agent` | 5 | 1-2h | Tests + validation |
-| `docs-agent` | 5 | 1-2h | Documentation |
+# Data cleanup
+python cleanup_incomplete_data.py
 
-## 📚 Documentation
-- **Plan Implémentation** : `docs/PLAN_MVP_IMPLEMENTATION.md`
-- **Agents Guide** : `docs/AGENTS_GUIDE.md`
-- **Setup Supabase** : `docs/SETUP_SUPABASE.md`
-- **Google Maps** : `docs/GOOGLE_MAPS_SETUP.md`
-- **Requirements** : `docs/MVP_REQUIREMENTS.md`
-- **Contexte** : `docs/CONTEXT_PROJET.md`
-
-## 📁 Structure
-```
-src/supabase_data_retriever.py       # Phase 2: DB requêtes
-src/estimation_algorithm.py           # Phase 3: Scoring/estimation
-src/streamlit_components/             # Phase 4: UI composants
-src/utils/geocoding.py                # Phase 4: Google Maps wrapper
-app.py                                # Phase 4: Streamlit principal
+# Git workflow
+git add . && git commit -m "feat: description courte"
+git push origin main
 ```
 
-## 🚀 Timeline
-- Phase 1 (1-2h) : Setup agents + infrastructure ✅ (d7dde1a)
-- Phase 2 (2-3h) : Supabase + requêtes DVF+ ✅ (d6ebd49)
-  - 145,000 mutations importées
-  - SupabaseDataRetriever opérationnel
-  - 5/5 tests passants
-- Phase 3 (2-3h) : Algorithmes estimation ⏳
-- Phase 4 (3-4h) : Interface Streamlit MVP ⏳
-- Phase 5 (1-2h) : Tests + validation ⏳
+## 🎨 Règles de Style Code
+- **Python** : PEP 8, type hints obligatoires
+- **Nommage** : `snake_case` pour variables/fonctions, `PascalCase` pour classes
+- **Docstrings** : Style Google (3 lignes min pour fonctions publiques)
+- **Imports** : Stdlib → third-party → local (groupes séparés)
+- **Tests** : Require coverage ≥80%, 1 fichier test par module
 
-## 📞 Contacts
-- **PRD Notion** : https://www.notion.so/Automatisation-des-estimations-2fc6cfd339504d1bbf444c0ae078ff5c
-- **Config** : `.env.example` (copier en `.env`)
-- **Agents** : Voir `.claude/agents/` pour détails MCPs
+## 📁 Fichiers Clés
+- `src/supabase_data_retriever.py` : Requêtes PostGIS (Phase 2 ✅)
+- `src/estimation_algorithm.py` : Scoring multi-critères (Phase 3 ⏳)
+- `app.py` : Streamlit principal (Phase 4 ⏳)
+- `docs/CONTEXT_PROJET.md` : Contexte business complet
+- `docs/PLAN_MVP_IMPLEMENTATION.md` : Plan technique détaillé
 
----
+## 🤖 Agents Spécialisés
+- `supabase-data-agent` : PostgreSQL/PostGIS expertise
+- `estimation-algo-agent` : Algorithmes scoring/estimation
+- `streamlit-mvp-agent` : Interface Streamlit/Folium
+- `testing-agent` : Tests & validation
+- `docs-agent` : Documentation
 
-**Statut Phase 2** : ✅ Supabase + DVF+ complétée
-**Prochaine étape** : Phase 3 avec `estimation-algo-agent`
+## 📊 Statut
+- Phase 1 ✅ : Setup infrastructure
+- Phase 2 ✅ : Supabase + 56,216 mutations DVF+
+- Phase 3 ⏳ : Algorithmes estimation (EN COURS)
+- Phase 4 ⏳ : Interface Streamlit MVP
+- Phase 5 ⏳ : Tests + validation
+
+## 🔍 Context Optimization
+- ✅ Autocompact désactivé (`.claude.json`)
+- ⏳ Memory tool en setup (`.claude/memories/`)
+- 📚 Voir `docs/CONTEXT_OPTIMIZATION.md` pour détails
+
+## 📚 Références
+- **PRD** : https://www.notion.so/Automatisation-des-estimations-2fc6cfd339504d1bbf444c0ae078ff5c
+- **Agents** : `.claude/agents/` pour MCPs détaillés

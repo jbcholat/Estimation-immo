@@ -1,0 +1,40 @@
+======================================================================
+PROJECT FILE STRUCTURE REPORT
+Generated: 2025-10-26 08:11:47
+======================================================================
+
+ROOT DIRECTORY CONTENTS:
+Total files in root: 19
+
+Configuration: (2 files)
+  - dvf_plus_structure.json
+  - vercel.json
+
+Data Files: (1 files)
+  - insee_mapping.csv
+
+Documentation: (5 files)
+  - CHANGELOG.md
+  - CLAUDE.md
+  - CONTRIBUTING.md
+  - README.md
+  - VERSIONING.md
+
+Other: (1 files)
+  - Makefile
+
+Python Scripts: (9 files)
+  - activate_postgis.py
+  - app.py
+  - cleanup_incomplete_data.py
+  - correction_phase3_insee.py
+  - debug_recherche.py
+  - test_phase2_integration.py
+  - test_phase3_estimations.py
+  - test_supabase_connection.py
+  - validate_phase3_with_real_data.py
+
+Text Files: (1 files)
+  - requirements.txt
+
+======================================================================

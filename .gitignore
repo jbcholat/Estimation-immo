@@ -87,3 +87,46 @@ logs/
 *.tmp
 *.bak
 grok-mcp/
+
+# ============================================================================
+# PROJECT-SPECIFIC PATTERNS
+# ============================================================================
+
+# Models & Artifacts
+models/**/*.pkl
+models/**/*.h5
+models/**/*.pth
+
+# Results & Outputs
+results/
+outputs/
+plots/
+reports/
+
+# Large data files
+*.parquet
+*.h5
+*.hdf5
+
+# DVC (future versioning)
+.dvc/
+.dvc.lock
+
+# Supabase local
+.supabase/
+
+# Archive backups
+archive/**/*.backup
+archive/**/*.bak
+
+# Pre-commit cache
+.pre-commit/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+
+# Coverage reports
+coverage.xml
+*.cover
+.hypothesis/
