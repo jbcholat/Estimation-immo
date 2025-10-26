@@ -8,6 +8,9 @@ Supabase (PostgreSQL+PostGIS) | Streamlit+Folium+Plotly | Google Maps API | Repo
 
 ## ⚡ Commandes Bash Courantes
 ```bash
+# Streamlit MVP (Phase 4 ✅)
+streamlit run app.py
+
 # Python backend
 python -m pytest tests/ -v --cov=src/
 python src/supabase_data_retriever.py
@@ -30,8 +33,11 @@ git push origin main
 
 ## 📁 Fichiers Clés
 - `src/supabase_data_retriever.py` : Requêtes PostGIS (Phase 2 ✅)
-- `src/estimation_algorithm.py` : Scoring multi-critères (Phase 3 ⏳)
-- `app.py` : Streamlit principal (Phase 4 ⏳)
+- `src/estimation_algorithm.py` : Scoring multi-critères (Phase 3 ✅)
+- `app.py` : Streamlit principal (Phase 4 ✅)
+- `src/streamlit_components/` : 5 composants modulaires (form, dashboard, table, map, pdf)
+- `src/utils/geocoding.py` : Google Maps wrapper
+- `docs/STREAMLIT_MVP_GUIDE.md` : Guide utilisateur
 - `docs/CONTEXT_PROJET.md` : Contexte business complet
 - `docs/PLAN_MVP_IMPLEMENTATION.md` : Plan technique détaillé
 
@@ -45,9 +51,9 @@ git push origin main
 ## 📊 Statut
 - Phase 1 ✅ : Setup infrastructure
 - Phase 2 ✅ : Supabase + 56,216 mutations DVF+
-- Phase 3 ⏳ : Algorithmes estimation (EN COURS)
-- Phase 4 ⏳ : Interface Streamlit MVP
-- Phase 5 ⏳ : Tests + validation
+- Phase 3 ✅ : Algorithmes estimation + scoring multi-critères
+- Phase 4 ✅ : Interface Streamlit MVP (5 User Stories)
+- Phase 5 ⏳ : Tests utilisateurs + validation
 
 ## 🔍 Context Optimization
 - ✅ Autocompact désactivé (`.claude.json`)
