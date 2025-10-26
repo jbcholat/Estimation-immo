@@ -51,7 +51,7 @@ class SupabaseDataRetriever:
             limit: Nombre maximal de résultats
 
         Returns:
-            DataFrame avec colonnes: idmutation, datemut, valeurfonc, sbati, distance_km, libtypbien
+            DataFrame avec colonnes: idmutation, datemut, valeurfonc, sbati, distance_km, libnatmut
         """
 
         try:
@@ -93,7 +93,7 @@ class SupabaseDataRetriever:
                     # Convertir TOUTES les colonnes Decimal en float
                     from decimal import Decimal
                     for col in df.columns:
-                        if col not in ['idmutation', 'coddep', 'libtypbien', 'geom_text', 'datemut']:
+                        if col not in ['idmutation', 'coddep', 'libnatmut', 'geom_text', 'datemut']:
                             try:
                                 # Convert Decimal and numeric types to float
                                 df[col] = df[col].apply(lambda x: float(x) if x is not None else None)

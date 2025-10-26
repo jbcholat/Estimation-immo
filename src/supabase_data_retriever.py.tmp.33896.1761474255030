@@ -51,7 +51,7 @@ class SupabaseDataRetriever:
             limit: Nombre maximal de résultats
 
         Returns:
-            DataFrame avec colonnes: idmutation, datemut, valeurfonc, sbati, distance_km, libtypbien
+            DataFrame avec colonnes: idmutation, datemut, valeurfonc, sbati, distance_km, libnatmut
         """
 
         try:

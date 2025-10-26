@@ -535,7 +535,7 @@ class EstimationAlgorithm:
             target_longitude: Longitude du bien cible
             target_surface: Surface m² du bien cible
             target_type: Type du bien cible (Appartement, Maison, etc.)
-            comparables: Liste de comparables (dict avec keys: latitude, longitude, sbati, libtypbien, datemut, valeurfonc)
+            comparables: Liste de comparables (dict avec keys: latitude, longitude, sbati, libnatmut, datemut, valeurfonc)
 
         Returns:
             Dict complet avec estimation, fiabilité, prix au m², etc.
