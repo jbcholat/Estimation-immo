@@ -74,14 +74,31 @@ class SupabaseDataRetriever:
                       AND valeurfonc > 0
                       AND datemut IS NOT NULL
                       AND geomlocmut IS NOT NULL
+                      AND datemut >= CURRENT_DATE - INTERVAL '1 day' * :annees * 365
+                      AND (libtypbien LIKE :type_pattern OR libtypbien LIKE :type_pattern2)
                     ORDER BY datemut DESC
                     LIMIT :limit
                 """)
 
+                # Build type filter patterns
+                type_patterns = {
+                    "Appartement": ("%APPARTEMENT%", "%STUDIO%"),
+                    "Maison": ("%MAISON%", "%VILLA%"),
+                    "Terrain": ("%TERRAIN%", "%PARCELLE%")
+                }
+
+                if type_bien in type_patterns:
+                    type_pattern, type_pattern2 = type_patterns[type_bien]
+                else:
+                    type_pattern, type_pattern2 = ("%", "%")
+
                 result = conn.execute(query, {
                     'surface_min': surface_min,
                     'surface_max': surface_max,
-                    'limit': limit
+                    'limit': limit,
+                    'annees': annees,
+                    'type_pattern': type_pattern,
+                    'type_pattern2': type_pattern2
                 })
 
                 rows = result.fetchall()
