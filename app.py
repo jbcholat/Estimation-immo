@@ -61,16 +61,21 @@ st.markdown("""
 # CACHE & CONNEXIONS
 # ===================================
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def init_supabase_retriever():
     """Initialiser connexion Supabase (cache)"""
     logger.info("[INFO] Initialisation Supabase...")
-    retriever = SupabaseDataRetriever()
-    if retriever.test_connection():
-        logger.info("[OK] Connexion Supabase OK")
-        return retriever
-    else:
-        logger.error("[ERROR] Connexion Supabase echouee")
+    try:
+        retriever = SupabaseDataRetriever()
+        if retriever.test_connection():
+            logger.info("[OK] Connexion Supabase OK")
+            return retriever
+        else:
+            logger.error("[ERROR] Connexion Supabase echouee")
+            # Return retriever anyway - it will work when called
+            return retriever
+    except Exception as e:
+        logger.error(f"[ERROR] Exception Supabase: {e}")
         return None
 
 
