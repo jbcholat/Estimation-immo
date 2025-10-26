@@ -44,11 +44,11 @@ class Config:
         missing = [name for name, value in required if not value]
 
         if missing:
-            print(f"❌ Configuration manquante: {', '.join(missing)}")
-            print("   → Vérifier .env.local ou .env")
+            print(f"[ERROR] Configuration manquante: {', '.join(missing)}")
+            print("   -> Verifier .env.local ou .env")
             return False
 
-        print("✅ Configuration valide")
+        print("[OK] Configuration valide")
         return True
 
     @classmethod

@@ -64,20 +64,20 @@ st.markdown("""
 @st.cache_resource
 def init_supabase_retriever():
     """Initialiser connexion Supabase (cache)"""
-    logger.info("📡 Initialisation Supabase...")
+    logger.info("[INFO] Initialisation Supabase...")
     retriever = SupabaseDataRetriever()
     if retriever.test_connection():
-        logger.info("✅ Connexion Supabase OK")
+        logger.info("[OK] Connexion Supabase OK")
         return retriever
     else:
-        logger.error("❌ Connexion Supabase échouée")
+        logger.error("[ERROR] Connexion Supabase echouee")
         return None
 
 
 @st.cache_resource
 def init_estimation_algorithm():
     """Initialiser algorithme estimation"""
-    logger.info("🤖 Initialisation EstimationAlgorithm...")
+    logger.info("[INFO] Initialisation EstimationAlgorithm...")
     return EstimationAlgorithm()
 
 
@@ -191,17 +191,17 @@ else:
         estimator = init_estimation_algorithm()
 
         if retriever is None or estimator is None:
-            st.error("❌ Erreur initialisation services. Vérifiez configuration.")
+            st.error("[ERROR] Erreur initialisation services. Verifiez configuration.")
             st.stop()
 
     except Exception as e:
-        st.error(f"❌ Erreur initialisation: {e}")
+        st.error(f"[ERROR] Erreur initialisation: {e}")
         logger.error(f"Init error: {e}")
         st.stop()
 
     # Récupérer comparables depuis Supabase
     if st.session_state['comparables_df'] is None:
-        with st.spinner("📊 Recherche comparables..."):
+        with st.spinner("Recherche comparables en cours..."):
             try:
                 comparables_df = retriever.get_comparables(
                     latitude=bien_params['latitude'],
@@ -217,12 +217,12 @@ else:
                 st.session_state['comparables_df'] = comparables_df
 
                 if len(comparables_df) > 0:
-                    st.success(f"✅ {len(comparables_df)} comparable(s) trouvé(s)")
+                    st.success(f"[OK] {len(comparables_df)} comparable(s) trouve(s)")
                 else:
-                    st.warning("⚠️ Aucun comparable trouvé avec ces critères")
+                    st.warning("[WARNING] Aucun comparable trouve avec ces criteres")
 
             except Exception as e:
-                st.error(f"❌ Erreur recherche comparables: {e}")
+                st.error(f"[ERROR] Erreur recherche comparables: {e}")
                 logger.error(f"Comparables error: {e}")
                 st.stop()
 
@@ -230,7 +230,7 @@ else:
 
     # Effectuer estimation
     if st.session_state['estimation_result'] is None and len(comparables_df) > 0:
-        with st.spinner("🤖 Calcul estimation..."):
+        with st.spinner("Calcul estimation en cours..."):
             try:
                 # Convertir DF en list de dicts pour estimateur
                 comparables_list = comparables_df.to_dict('records')
@@ -247,12 +247,12 @@ else:
                 st.session_state['estimation_result'] = estimation_result
 
                 if estimation_result.get('success'):
-                    st.success("✅ Estimation calculée")
+                    st.success("[OK] Estimation calculee")
                 else:
-                    st.error(f"❌ Erreur estimation: {estimation_result.get('erreur')}")
+                    st.error(f"[ERROR] Erreur estimation: {estimation_result.get('erreur')}")
 
             except Exception as e:
-                st.error(f"❌ Erreur calcul estimation: {e}")
+                st.error(f"[ERROR] Erreur calcul estimation: {e}")
                 logger.error(f"Estimation error: {e}")
                 st.stop()
 
@@ -308,7 +308,7 @@ else:
             )
 
     else:
-        st.error("❌ Impossible d'effectuer l'estimation. Vérifiez données et comparables.")
+        st.error("[ERROR] Impossible d'effectuer l'estimation. Verifiez donnees et comparables.")
 
 # ===================================
 # FOOTER

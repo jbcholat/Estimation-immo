@@ -20,11 +20,11 @@ class GeocodingService:
     def __init__(self):
         """Initialise le client Google Maps"""
         if not Config.GOOGLE_MAPS_API_KEY:
-            logger.error("❌ GOOGLE_MAPS_API_KEY non configurée")
+            logger.error("[ERROR] GOOGLE_MAPS_API_KEY non configurée")
             self.client = None
         else:
             self.client = googlemaps.Client(key=Config.GOOGLE_MAPS_API_KEY)
-            logger.info("✅ Google Maps client initialisé")
+            logger.info("[OK] Google Maps client initialisé")
 
     def geocode_address(self, address: str) -> List[Dict]:
         """
@@ -41,14 +41,14 @@ class GeocodingService:
             - 'place_id': Google Place ID
         """
         if not self.client:
-            logger.error("❌ Client Google Maps non initialisé")
+            logger.error("[ERROR] Client Google Maps non initialisé")
             return []
 
         try:
             results = self.client.geocode(address=address)
 
             if not results:
-                logger.warning(f"⚠️ Aucun résultat pour: {address}")
+                logger.warning(f"[WARNING] Aucun résultat pour: {address}")
                 return []
 
             suggestions = []
@@ -62,14 +62,14 @@ class GeocodingService:
                 }
                 suggestions.append(suggestion)
 
-            logger.info(f"✅ {len(suggestions)} suggestion(s) trouvée(s) pour: {address}")
+            logger.info(f"[OK] {len(suggestions)} suggestion(s) trouvee(s) pour: {address}")
             return suggestions
 
         except googlemaps.exceptions.ApiError as e:
-            logger.error(f"❌ Erreur API Google Maps: {e}")
+            logger.error(f"[ERROR] Erreur API Google Maps: {e}")
             return []
         except Exception as e:
-            logger.error(f"❌ Erreur géocodage: {e}")
+            logger.error(f"[ERROR] Erreur geocodage: {e}")
             return []
 
     def get_coordinates(self, address: str) -> Optional[Tuple[float, float]]:
