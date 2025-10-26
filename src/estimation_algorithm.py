@@ -607,7 +607,7 @@ class EstimationAlgorithm:
     def _comparables_summary(self, comparables_scored: List[Tuple[Dict, float]]) -> Dict:
         """Résumé statistique des comparables"""
         try:
-            valides = [(c, s) for c, s in comparables_scored if s >= 70]
+            valides = [(c, s) for c, s in comparables_scored if s >= 40]
             if not valides:
                 return {}
 
