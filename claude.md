@@ -53,7 +53,7 @@ git push origin main
 - Phase 2 ✅ : Supabase + 56,216 mutations DVF+
 - Phase 3 ✅ : Algorithmes estimation + scoring multi-critères
 - Phase 4 ✅ : Interface Streamlit MVP (5 User Stories)
-- Phase 5 ⏳ : Tests utilisateurs + validation
+- Phase 5 ✅ : Test infrastructure (39 tests, 22 passing) - Ready for UAT
 
 ## 🔍 Context Optimization
 - ✅ Autocompact désactivé (`.claude.json`)
