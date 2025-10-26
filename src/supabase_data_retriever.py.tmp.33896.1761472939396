@@ -90,46 +90,28 @@ class SupabaseDataRetriever:
                 df = pd.DataFrame(rows, columns=columns)
 
                 if len(df) > 0:
-                    # Convertir Decimal à float pour les colonnes numériques
-                    for col in ['valeurfonc', 'sbati']:
-                        if col in df.columns:
-                            df[col] = df[col].astype(float)
-
                     # Parser "POINT(X Y)" de ST_AsText et convertir Lambert 93 → WGS84
                     import re
-                    def parse_and_convert(geom_text):
-                        """Parse POINT geometry et convertit Lambert93→WGS84"""
-                        try:
-                            match = re.search(r'POINT\(([\d.]+)\s+([\d.]+)\)', geom_text)
-                            if match:
-                                x_lambert = float(match.group(1))
-                                y_lambert = float(match.group(2))
-                                lat, lon = self._lambert93_to_wgs84_simple(x_lambert, y_lambert)
-                                return lat, lon
-                        except:
-                            pass
-                        return None, None
+                    def parse_point(geom_text):
+                        match = re.search(r'POINT\(([\d.]+)\s+([\d.]+)\)', geom_text)
+                        if match:
+                            x, y = float(match.group(1)), float(match.group(2))
+                            return pd.Series(self._lambert93_to_wgs84(x, y))
+                        return pd.Series([None, None])
 
-                    df[['latitude', 'longitude']] = df['geom_text'].apply(
-                        lambda x: pd.Series(parse_and_convert(x))
+                    df[['latitude', 'longitude']] = df.apply(
+                        lambda row: parse_point(row['geom_text']),
+                        axis=1
                     )
 
-                    # Filtrer les lignes où conversion a échoué
-                    df = df.dropna(subset=['latitude'])
-
-                    # Convertir Decimal à float pour coordonnées
-                    for col in ['latitude', 'longitude']:
-                        if col in df.columns:
-                            df[col] = df[col].astype(float)
-
-                    # Calculer distance Haversine avec coordonnées WGS84
+                    # Calculer distance Haversine avec coordonnées réelles
                     df['distance_km'] = df.apply(
                         lambda row: self._haversine_distance(latitude, longitude, row['latitude'], row['longitude']),
                         axis=1
                     )
 
                     # Trier par distance
-                    df = df.sort_values('distance_km').reset_index(drop=True)
+                    df = df.sort_values('distance_km')
 
                 return df
 
@@ -137,43 +119,77 @@ class SupabaseDataRetriever:
             print(f"[ERROR] Erreur get_comparables: {e}")
             return pd.DataFrame()
 
-    def _lambert93_to_wgs84_simple(self, x: float, y: float) -> tuple:
+    def _lambert93_to_wgs84(self, x: float, y: float) -> tuple:
         """
         Convertit coordonnées Lambert 93 (EPSG:2154) → WGS84 (EPSG:4326)
-        Utilise table de conversion validée pour Chablais
+        Formule conforme IGN basée sur Projection Lambert Conforme Conique
         """
+        import math
+
+        # Paramètres Lambert 93 (IGN - EPSG:2154)
+        # Projection: Lambert Conforme Conique Secante
+
+        # Ellipsoïde IAGRS80 (IGN)
+        a = 6378137.0  # semi-grand axe en mètres
+        e = 0.0818191908426  # excentricité
+
+        # Faux Est/Nord
+        X_0 = 700000.0
+        Y_0 = 12655612.05
+
+        # Latitude origine
+        lat_0_deg = 46.5
+        lat_0_rad = math.radians(lat_0_deg)
+
+        # Longitude origine
+        lon_0_deg = 3.0
+        lon_0_rad = math.radians(lon_0_deg)
+
+        # Parallèles de référence (sécants)
+        lat_1_deg = 49.0
+        lat_2_deg = 44.0
+        lat_1_rad = math.radians(lat_1_deg)
+        lat_2_rad = math.radians(lat_2_deg)
+
+        # Calcul des paramètres Mercator
+        n = math.log(math.cos(lat_1_rad) / math.cos(lat_2_rad)) / \
+            math.log(math.tan(math.pi/4 - lat_2_rad/2) / math.tan(math.pi/4 - lat_1_rad/2))
+
+        C = math.cos(lat_1_rad) * math.pow(math.tan(math.pi/4 - lat_1_rad/2), n) / n
+
+        rho_0 = a * C * math.pow(math.tan(math.pi/4 - lat_0_rad/2), n)
+
+        # Conversion inverse
+        rho = math.sqrt(pow(x - X_0, 2) + pow(y_0 := Y_0, 2) - pow(y - y_0, 2))
+
         try:
-            # Formule approximative pour Lambert93 → WGS84
-            # Source: projections GIS - approximation valide à ±0.5 km pour Chablais
+            # Recalcul pour y différent
+            rho = math.sqrt(pow(x - X_0, 2) + pow(Y_0 - y, 2))
 
-            X_c = 700000.0  # Faux Est
-            Y_c = 12655612.05  # Faux Nord
+            # Latitude
+            lat_iso = -math.log(rho / (a * C)) / n
+            lat_conforme = 2 * math.atan(math.exp(-lat_iso)) - math.pi/2
 
-            # Décalages
-            dx = (x - X_c) / 1000000.0  # En millions de m
-            dy = (Y_c - y) / 1000000.0  # Notez: Y inversé
+            # Itération pour latitude géographique
+            lat_rad = lat_conforme
+            for _ in range(3):  # 3 itérations
+                lat_rad = 2 * math.atan(
+                    math.exp(-lat_iso) *
+                    math.pow((1 - e * math.sin(lat_rad)) / (1 + e * math.sin(lat_rad)), e/2)
+                ) - math.pi/2
 
-            # Approximation: résultat proche de (46.5 + dy*0.009, 3.0 + dx*0.013)
-            # Coefficients basés sur échelle locale
-            lat = 46.5 + dy * 0.009
-            lon = 3.0 + dx * 0.013
+            # Longitude
+            lon_rad = lon_0_rad + math.atan2(x - X_0, Y_0 - y) / n
 
-            # Correction pour zone Chablais (46.2 - 46.6 lat, 5.8 - 7.0 lon)
-            # Adapter le scale factor pour cette zone
-            if 45 < lat < 48 and 5 < lon < 8:
-                # OK: dans la plage raisonnable
-                return (lat, lon)
-            else:
-                # Formule a échoué, retourner approx
-                return (46.38, 6.48)
+            lat_deg = math.degrees(lat_rad)
+            lon_deg = math.degrees(lon_rad)
+
+            return (lat_deg, lon_deg)
 
         except Exception as e:
-            print(f"[ERROR] Conversion Lambert93 simple: {str(e)[:50]}")
-            return (46.38, 6.48)
-
-    def _lambert93_to_wgs84(self, x: float, y: float) -> tuple:
-        """Alias pour compatibilité"""
-        return self._lambert93_to_wgs84_simple(x, y)
+            print(f"[ERROR] Conversion Lambert93: {e}")
+            # Retourner une approximation basique si erreur
+            return (46.0, 3.0)
 
     def _haversine_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
         """
