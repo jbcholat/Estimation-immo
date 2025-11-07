@@ -87,3 +87,4 @@ logs/
 *.tmp
 *.bak
 grok-mcp/
+FIGMA_CONFIG_INSTRUCTIONS.md
