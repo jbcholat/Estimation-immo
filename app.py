@@ -251,6 +251,12 @@ else:
 
                 st.session_state['estimation_result'] = estimation_result
 
+                # Ajouter les scores au DataFrame des comparables
+                if estimation_result.get('success') and estimation_result.get('comparables_with_scores'):
+                    comparables_with_scores = pd.DataFrame(estimation_result['comparables_with_scores'])
+                    st.session_state['comparables_df'] = comparables_with_scores
+                    comparables_df = comparables_with_scores
+
                 if estimation_result.get('success'):
                     st.success("[OK] Estimation calculee")
                 else:

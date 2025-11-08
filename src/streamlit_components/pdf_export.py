@@ -195,8 +195,11 @@ def generate_pdf_report(
     if comparables_df is not None and len(comparables_df) > 0:
         elements.append(Paragraph("TOP COMPARABLES", heading_style))
 
-        # Top 5 par score
-        df_sorted = comparables_df.sort_values('score', ascending=False).head(5)
+        # Top 5 par score (si existe) ou par prix
+        if 'score' in comparables_df.columns:
+            df_sorted = comparables_df.sort_values('score', ascending=False).head(5)
+        else:
+            df_sorted = comparables_df.sort_values('valeurfonc', ascending=False).head(5)
 
         comp_data = [["Prix (€)", "Surface (m²)", "Distance (km)", "Score", "Date"]]
 

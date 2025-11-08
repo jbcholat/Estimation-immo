@@ -10,8 +10,12 @@ from typing import List, Dict, Optional
 import pandas as pd
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
+from pyproj import Transformer
 
 load_dotenv()
+
+# Initialize Lambert93 to WGS84 transformer globally
+_TRANSFORMER_2154_4326 = Transformer.from_crs('EPSG:2154', 'EPSG:4326')
 
 
 class SupabaseDataRetriever:
@@ -74,7 +78,7 @@ class SupabaseDataRetriever:
                       AND valeurfonc > 0
                       AND datemut IS NOT NULL
                       AND geomlocmut IS NOT NULL
-                      AND datemut >= CURRENT_DATE - INTERVAL '1 day' * :annees * 365
+                      AND datemut >= CURRENT_DATE - (:annees * 365)::integer * INTERVAL '1 day'
                       AND (libtypbien LIKE :type_pattern OR libtypbien LIKE :type_pattern2)
                     ORDER BY datemut DESC
                     LIMIT :limit
@@ -162,36 +166,14 @@ class SupabaseDataRetriever:
     def _lambert93_to_wgs84_simple(self, x: float, y: float) -> tuple:
         """
         Convertit coordonnées Lambert 93 (EPSG:2154) → WGS84 (EPSG:4326)
-        Utilise table de conversion validée pour Chablais
+        Utilise pyproj pour une conversion exacte
         """
         try:
-            # Formule approximative pour Lambert93 → WGS84
-            # Source: projections GIS - approximation valide à ±0.5 km pour Chablais
-
-            X_c = 700000.0  # Faux Est
-            Y_c = 12655612.05  # Faux Nord
-
-            # Décalages
-            dx = (x - X_c) / 1000000.0  # En millions de m
-            dy = (Y_c - y) / 1000000.0  # Notez: Y inversé
-
-            # Approximation: résultat proche de (46.5 + dy*0.009, 3.0 + dx*0.013)
-            # Coefficients basés sur échelle locale
-            lat = 46.5 + dy * 0.009
-            lon = 3.0 + dx * 0.013
-
-            # Correction pour zone Chablais (46.2 - 46.6 lat, 5.8 - 7.0 lon)
-            # Adapter le scale factor pour cette zone
-            if 45 < lat < 48 and 5 < lon < 8:
-                # OK: dans la plage raisonnable
-                return (lat, lon)
-            else:
-                # Formule a échoué, retourner approx
-                return (46.38, 6.48)
-
+            lat, lon = _TRANSFORMER_2154_4326.transform(x, y)
+            return (lat, lon)
         except Exception as e:
-            print(f"[ERROR] Conversion Lambert93 simple: {str(e)[:50]}")
-            return (46.38, 6.48)
+            logger.error(f"[ERROR] Conversion Lambert93: {str(e)}")
+            return (None, None)
 
     def _lambert93_to_wgs84(self, x: float, y: float) -> tuple:
         """Alias pour compatibilité"""

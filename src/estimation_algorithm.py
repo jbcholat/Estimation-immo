@@ -595,6 +595,9 @@ class EstimationAlgorithm:
                 "fiabilite": confidence,
                 "nb_comparables_utilises": estimation["nb_comparables_utilises"],
                 "comparables_summary": self._comparables_summary(comparables_scored),
+                "comparables_with_scores": [
+                    {**c, "score": s} for c, s in comparables_scored
+                ],
                 "timestamp": datetime.now().isoformat()
             }
         except Exception as e:

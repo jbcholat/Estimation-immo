@@ -28,7 +28,7 @@ def render_map_viewer(
         bien_address: Adresse du bien (optionnel, pour popup)
     """
 
-    if not bien_coords or not comparables_df or len(comparables_df) == 0:
+    if not bien_coords or comparables_df is None or len(comparables_df) == 0:
         st.warning("⚠️ Données insuffisantes pour afficher la carte")
         return
 

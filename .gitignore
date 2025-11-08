@@ -85,8 +85,13 @@ logs/
 
 # Temporary files
 *.tmp
+*.tmp.*
 *.bak
 grok-mcp/
+venv_immobilier/
+context/WORKING.md
+streamlit.log
+.streamlit/
 
 # ============================================================================
 # PROJECT-SPECIFIC PATTERNS
