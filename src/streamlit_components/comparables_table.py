@@ -102,44 +102,72 @@ def render_comparables_table(
     st.markdown(f"**✅ {len(df_filtered)} / {len(comparables_df)} comparables sélectionnés**")
 
     # === SECTION 3 : AFFICHAGE TABLEAU ===
-    # Préparer colonnes pour affichage
+    # Préparer colonnes pour affichage (9 colonnes selon Issue #2)
     display_cols = []
-    if 'idmutation' in df_filtered.columns:
-        display_cols.append('idmutation')
+    if 'adresse' in df_filtered.columns:
+        display_cols.append('adresse')
+    if 'libtypbien' in df_filtered.columns:
+        display_cols.append('libtypbien')
     if 'datemut' in df_filtered.columns:
         display_cols.append('datemut')
     if 'valeurfonc' in df_filtered.columns:
         display_cols.append('valeurfonc')
     if 'sbati' in df_filtered.columns:
         display_cols.append('sbati')
-    if 'distance_km' in df_filtered.columns:
-        display_cols.append('distance_km')
+    if 'prix_m2' in df_filtered.columns:
+        display_cols.append('prix_m2')
+    if 'nblocmut' in df_filtered.columns:
+        display_cols.append('nblocmut')
     if 'score' in df_filtered.columns:
         display_cols.append('score')
+    if 'distance_km' in df_filtered.columns:
+        display_cols.append('distance_km')
 
     df_display = df_filtered[display_cols].copy() if display_cols else df_filtered
 
     # Formatter colonnes
     col_config = {}
+    if 'adresse' in df_display.columns:
+        col_config['adresse'] = st.column_config.TextColumn("Adresse", width="large")
+    if 'libtypbien' in df_display.columns:
+        col_config['libtypbien'] = st.column_config.TextColumn("Type", width="medium")
+    if 'datemut' in df_display.columns:
+        col_config['datemut'] = st.column_config.TextColumn("Date vente", width="small")
     if 'valeurfonc' in df_display.columns:
         col_config['valeurfonc'] = st.column_config.NumberColumn(
-            "Prix (€)",
-            format="%,.0f"
+            "Prix vente (€)",
+            format="%,.0f",
+            width="medium"
         )
     if 'sbati' in df_display.columns:
         col_config['sbati'] = st.column_config.NumberColumn(
             "Surface (m²)",
-            format="%.0f"
+            format="%.0f",
+            width="small"
+        )
+    if 'prix_m2' in df_display.columns:
+        col_config['prix_m2'] = st.column_config.NumberColumn(
+            "Prix/m² (€)",
+            format="%.0f",
+            width="small"
+        )
+    if 'nblocmut' in df_display.columns:
+        col_config['nblocmut'] = st.column_config.NumberColumn(
+            "Nb pièces",
+            format="%.0f",
+            width="small"
+        )
+    if 'score' in df_display.columns:
+        col_config['score'] = st.column_config.NumberColumn(
+            "Pertinence",
+            format="%.0f",
+            width="small"
         )
     if 'distance_km' in df_display.columns:
         col_config['distance_km'] = st.column_config.NumberColumn(
             "Distance (km)",
-            format="%.1f"
-        )
-    if 'score' in df_display.columns:
-        col_config['score'] = st.column_config.NumberColumn(
-            "Score",
-            format="%.0f"
+            format="%.1f",
+            width="small"
         )
 
     # Afficher dataframe interactif

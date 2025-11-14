@@ -148,6 +148,43 @@ def get_best_match(address: str, zone_filter: Optional[str] = None) -> Optional[
     return service.get_best_match(address, zone_filter)
 
 
+def reverse_geocode(latitude: float, longitude: float) -> Optional[str]:
+    """
+    Reverse geocodage: Convertit coordonnées (lat, lon) → adresse.
+
+    Args:
+        latitude: Latitude WGS84
+        longitude: Longitude WGS84
+
+    Returns:
+        Adresse formatée ou None si erreur
+    """
+    service = get_geocoding_service()
+    if not service or not service.client:
+        logger.warning("[WARNING] Google Maps client non disponible pour reverse geocoding")
+        return None
+
+    try:
+        results = service.client.reverse_geocode((latitude, longitude))
+
+        if not results:
+            logger.warning(f"[WARNING] Aucun résultat reverse pour: ({latitude}, {longitude})")
+            return None
+
+        # Retourner la première adresse formatée
+        formatted_address = results[0].get('formatted_address', None)
+        if formatted_address:
+            logger.debug(f"[OK] Reverse geocode trouvé: {formatted_address}")
+        return formatted_address
+
+    except googlemaps.exceptions.ApiError as e:
+        logger.error(f"[ERROR] Erreur API reverse geocoding: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"[ERROR] Erreur reverse geocoding: {e}")
+        return None
+
+
 if __name__ == "__main__":
     # Test
     logging.basicConfig(level=logging.INFO)

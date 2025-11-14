@@ -157,6 +157,29 @@ class SupabaseDataRetriever:
                     # Trier par distance
                     df = df.sort_values('distance_km').reset_index(drop=True)
 
+                    # Formatter la date
+                    if 'datemut' in df.columns:
+                        df['datemut'] = pd.to_datetime(df['datemut']).dt.strftime('%d/%m/%Y')
+
+                    # Calculer prix au m²
+                    df['prix_m2'] = df['valeurfonc'] / df['sbati']
+
+                    # Ajouter adresses via reverse geocoding
+                    try:
+                        from src.utils.geocoding import reverse_geocode
+                        addresses = []
+                        for idx, row in df.iterrows():
+                            addr = reverse_geocode(row['latitude'], row['longitude'])
+                            addresses.append(addr if addr else f"({row['latitude']:.4f}, {row['longitude']:.4f})")
+                        df['adresse'] = addresses
+                    except Exception as e:
+                        print(f"[WARNING] Erreur reverse geocoding: {e}")
+                        # Fallback: utiliser coordonnées
+                        df['adresse'] = df.apply(
+                            lambda row: f"({row['latitude']:.4f}, {row['longitude']:.4f})",
+                            axis=1
+                        )
+
                 return df
 
         except Exception as e:
