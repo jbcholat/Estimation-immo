@@ -1,331 +1,470 @@
-# 🚀 PHASE 4 - Guide pour Demain (Interface Streamlit MVP)
+# 🏗️ STRATÉGIE DE MIGRATION FRONTEND
+## De Streamlit MVP à Architecture Production (Next.js + FastAPI)
 
-**Date de préparation** : 2025-10-22
-**À lancer** : 2025-10-23 (nouvelle conversation)
-**Durée estimée** : 3-4h
-
----
-
-## ✅ RECAP - Ce qui est TERMINE
-
-### Phase 1-3 Complétées ✅
-
-```
-✅ Phase 1 (d7dde1a) : Setup agents + infrastructure
-✅ Phase 2 (d6ebd49) : Supabase + DVF+ import (145k mutations)
-✅ Phase 3 (20f773c) : EstimationAlgorithm (33/33 tests passants)
-
-Phase 4 : Interface Streamlit MVP ⏳ (À faire)
-Phase 5 : Tests + validation ⏳
-```
-
-### EstimationAlgorithm Opérationnel ✅
-
-```
-Classe EstimationAlgorithm complète avec:
-- SimilarityScorer: Scoring 0-100 multi-critères
-- EstimationEngine: Estimation pondérée
-- ConfidenceCalculator: Fiabilité 4 composantes
-- TemporalAdjuster: Inflation + marché Chablais
-
-Code: src/estimation_algorithm.py
-Tests: 33/33 passants (test_phase3_estimations.py)
-Validation: 3/3 biens Chablais estimés avec succès
-```
+**Version:** 2.0 (Architecturée par utilisateur + Agent Plan)
+**Date:** 2025-11-08
+**Statut:** Planification Phase 6 (Avant Phase 5 completion)
+**Auteur:** Jean-Baptiste CHOLAT + Claude Code
 
 ---
 
-## 🎯 PHASE 4 - OBJECTIF
+## 📋 RÉSUMÉ EXÉCUTIF
 
-Créer **interface Streamlit MVP** pour estimation immobilière :
+### Architecture Proposée (Validée ✅)
 
 ```
-USER FLOW:
-1. User entre adresse (ex: "10 Rue Victor Hugo, Thonon-les-Bains")
-2. Clic "Estimer"
-3. Système:
-   - Géocode adresse (Google Maps)
-   - Récupère comparables (Supabase)
-   - Estime prix (EstimationAlgorithm)
-   - Affiche résultats
-4. User peut exporter PDF
+Utilisateur Interne
+    ↓
+[Frontend: Next.js]
+├→ REST API Calls → [Backend: FastAPI on Railway.app]
+└→ Optional Direct SQL Reads → [Database: Supabase PostgreSQL + PostGIS]
+    ↓
+    [Business Logic]
+    ├─ Geocoding (Google Maps)
+    ├─ Estimation (Multi-criteria scoring)
+    ├─ PDF Generation (ReportLab)
+    └─ PostGIS Queries
 ```
 
-**Livrables** :
-- `app.py` : Streamlit principal
-- Formulaire saisie bien (adresse, type, surface, caractéristiques)
-- Affichage résultats (estimation, fourchette, fiabilité, graphiques)
-- Carte Folium (localisation + comparables)
-- Export PDF (ReportLab)
+### Phases de Migration
+
+| Phase | Timeline | Objectif | Statut |
+|-------|----------|----------|--------|
+| **Phase 5** | Nov 8-22, 2025 | Finaliser Streamlit MVP | ⏳ EN COURS |
+| **Phase 6** | Nov 25 - Dec 20 | Backend API extraction (FastAPI + Railway) | ⏳ À VENIR |
+| **Phase 7** | Dec 23 - Feb 14 | Frontend (Next.js + Vercel) | ⏳ À VENIR |
+| **Phase 8** | Feb 17-28 | Testing & validation complets | ⏳ À VENIR |
+| **Phase 9** | Mar 2-16 | Production deployment & cutover | ⏳ À VENIR |
+
+**Total Timeline:** ~14 semaines (Nov 2025 → Mar 2026)
 
 ---
 
-## 📁 FICHIERS UTILES POUR PHASE 4
+## 🎯 DÉCISIONS CLÉS
 
-| Fichier | Contenu | Usage |
-|---------|---------|-------|
-| `src/estimation_algorithm.py` | EstimationAlgorithm | Importer + utiliser .estimate() |
-| `src/supabase_data_retriever.py` | SupabaseDataRetriever | get_comparables() |
-| `PHASE3_RECAP_COMPLET.md` | Détails EstimationAlgorithm | Specs scoring/fiabilité |
-| `docs/MVP_REQUIREMENTS.md` | US1-US5 (user stories) | Specs interface |
-| `docs/GOOGLE_MAPS_SETUP.md` | Config Google Maps | Geocoding |
-| `.env` | Credentials | GOOGLE_MAPS_API_KEY, Supabase |
+### 1. **Next.js 15** (React Framework)
 
----
+**Pourquoi?**
+- ✅ Production-ready (Netflix, Airbnb, Uber)
+- ✅ Vercel natif (zero-config deployment)
+- ✅ Écosystème massif (shadcn/ui, Tailwind, etc.)
+- ✅ TypeScript support (type-safe)
+- ✅ Performance excellente (App Router, Server Components)
 
-## 🛠️ STACK PHASE 4
+**Alternative Considéré:** SvelteKit
+- ✗ Écosystème plus petit
+- ✗ Moins de developers disponibles
+- ✓ Mais: Plus rapide à développer (4-6 weeks vs 6-8 weeks)
 
-```
-Frontend:
-├── Streamlit 1.28+ (web app)
-├── Folium 0.14+ (cartes interactives)
-├── Plotly 5.18+ (graphiques)
-└── ReportLab 4.0+ (export PDF)
-
-Backend:
-├── src/estimation_algorithm.py (estimation)
-├── src/supabase_data_retriever.py (données)
-└── Google Maps Geocoding API (adresse → coords)
-```
+**Recommandation:** Next.js pour production long-term
 
 ---
 
-## 📋 TÂCHES PHASE 4 (3-4h)
+### 2. **FastAPI** (Backend Python)
 
-### Tâche 1 : Layout Streamlit (30 min)
-```python
-# app.py structure:
-├── st.title("Estimateur Immobilier - Chablais/Annemasse")
-├── SECTION 1: Formulaire saisie
-│   ├── Adresse (text input)
-│   ├── Type bien (selectbox)
-│   ├── Surface (number input)
-│   ├── Pièces (number input)
-│   └── Caractéristiques (checkboxes)
+**Pourquoi?**
+- ✅ Réuse code Python existant (supabase_retriever, estimation_algo)
+- ✅ Performance excellente (async/await, UV loop)
+- ✅ Auto-generated Swagger documentation
+- ✅ Pydantic models (type-safe validation)
+- ✅ Minimal boilerplate
+
+**Alternative:** Node.js (Express/NestJS)
+- ✗ Rewrite Python modules to TypeScript
+- ✗ Extra complexity
+
+**Recommandation:** FastAPI wins
+
+---
+
+### 3. **Railway.app** (Backend Hosting)
+
+**Pourquoi?**
+- ✅ EUR 5-50/mo (vs Heroku EUR 50+/mo)
+- ✅ Built-in PostgreSQL integration
+- ✅ Excellent DX
+- ✅ Auto-scaling
+- ✅ Docker support
+
+**Alternatives:** Heroku, AWS Lambda, render.com
+- Railway offers best balance of cost + DX
+
+**Recommandation:** Railway.app
+
+---
+
+### 4. **Hybrid SQL Strategy**
+
+**Question:** Peut-on faire des lectures directes Supabase du frontend?
+
+**Réponse:** OUI, mais stratégiquement
+
+```typescript
+// ✅ AUTORISÉ: Lecture simple directe
+const { data } = await supabase
+  .from('dvf_mutations')
+  .select('*')
+  .limit(100);
+
+// ❌ MIEUX via API: Calculs complexes
+// POST /api/comparables (PostGIS scoring)
+// POST /api/estimate (multi-criteria)
+```
+
+**Architecture Recommandée:**
+- Frontend: Lectures simples + React Query caching
+- Backend: Calculs complexes (scoring, PDF, estimation)
+
+---
+
+## 📊 ARCHITECTURE DÉTAILLÉE
+
+### 1️⃣ FRONTEND: Next.js + Vercel
+
+**Structure:**
+```
+frontend/
+├── app/ (App Router)
+│   ├── page.tsx (Landing)
+│   ├── estimation/page.tsx (Main flow)
+│   ├── dashboard/page.tsx (Results)
+│   └── api/ (Server routes, optional)
 │
-├── SECTION 2: Résultats
-│   ├── Estimation (metrique)
-│   ├── Fourchette (metrique)
-│   ├── Fiabilité (gauge/progress)
-│   ├── Graphique comparables (Plotly)
-│   └── Carte (Folium)
+├── components/
+│   ├── FormInput.tsx (Address + type + surface)
+│   ├── DashboardMetrics.tsx (Estimation display)
+│   ├── ComparablesTable.tsx (Filterable results)
+│   ├── MapViewer.tsx (Leaflet.js)
+│   └── PDFExport.tsx (Download)
 │
-└── SECTION 3: Export
-    └── Bouton PDF
+├── lib/
+│   ├── api.ts (Fetch wrappers → FastAPI)
+│   └── validations.ts (Zod schemas)
+│
+└── hooks/
+    ├── useEstimation.ts
+    ├── useComparables.ts
+    └── useGeocoding.ts
 ```
 
-### Tâche 2 : Intégration Geocoding (30 min)
-```python
-# Utiliser Google Maps API
-from utils.geocoding import geocode_address
+**Technologies:**
+- Framework: Next.js 15 (React + App Router)
+- Styling: Tailwind CSS
+- UI: shadcn/ui (pre-built components)
+- Maps: Leaflet.js (open-source)
+- Charts: Chart.js (lightweight)
+- Validation: Zod (type-safe)
+- Caching: React Query
+- Hosting: Vercel (auto-deploy Git)
 
-latitude, longitude = geocode_address("10 Rue Victor Hugo, 74200")
+---
+
+### 2️⃣ BACKEND: FastAPI + Railway
+
+**Structure:**
+```
+backend/
+├── main.py (Entry point)
+│
+├── routers/
+│   ├── geocoding.py (POST /api/geocode)
+│   ├── comparables.py (POST /api/comparables)
+│   ├── estimation.py (POST /api/estimate)
+│   ├── pdf.py (POST /api/generate-pdf)
+│   └── health.py (GET /api/health)
+│
+├── services/
+│   ├── supabase_service.py (Wrapper SupabaseDataRetriever)
+│   ├── estimation_service.py (Wrapper EstimationAlgorithm)
+│   ├── geocoding_service.py (Google Maps wrapper)
+│   └── pdf_service.py (ReportLab wrapper)
+│
+├── models/
+│   ├── requests.py (Pydantic request schemas)
+│   ├── responses.py (Pydantic response schemas)
+│   └── db.py (SQLAlchemy ORM)
+│
+└── middleware/
+    ├── cors.py (CORS configuration)
+    ├── auth.py (JWT validation - future)
+    └── error_handler.py (Error handling)
 ```
 
-**Fichier** : `src/utils/geocoding.py` (à créer)
-- Fonction `geocode_address(address_string) → (lat, lon)`
-- Gestion erreurs (adresse non trouvée, quota API)
+**Technologies:**
+- Framework: FastAPI
+- Server: Uvicorn (ASGI)
+- Validation: Pydantic
+- Database: SQLAlchemy + geoalchemy2
+- PDF: ReportLab
+- Hosting: Railway.app (serverless/container)
 
-### Tâche 3 : Intégration Estimation (45 min)
-```python
-# Workflow:
-from src.estimation_algorithm import EstimationAlgorithm
-from src.supabase_data_retriever import SupabaseDataRetriever
+**API Endpoints:**
+1. `POST /api/geocode` - Google Maps geocoding
+2. `POST /api/comparables` - Search comparable properties (PostGIS)
+3. `POST /api/estimate` - Calculate price estimation
+4. `POST /api/generate-pdf` - Generate PDF report
+5. `GET /api/health` - Health check
 
-algo = EstimationAlgorithm()
-retriever = SupabaseDataRetriever()
+---
 
-# 1. Récupérer comparables
-comparables = retriever.get_comparables(
-    latitude, longitude,
-    type_bien,
-    surface_min, surface_max,
-    rayon_km=10
-)
+### 3️⃣ DATABASE: Supabase (Unchanged)
 
-# 2. Estimer
-result = algo.estimate(
-    latitude, longitude, surface, type_bien,
-    comparables.to_dict('records')
-)
+- ✅ 56,216 mutations DVF+ already imported
+- ✅ PostgreSQL + PostGIS
+- ✅ 107 MB / 500 MB used (21%)
+- ✅ Ready for production
 
-# 3. Afficher
-st.metric("Prix estimé", f"{result['estimation']['prix_estime_eur']:,} EUR")
-```
-
-### Tâche 4 : Visualisations (60 min)
-1. **Carte Folium** :
-   - Marker bien cible (rouge)
-   - Markers comparables (bleu)
-   - Distance annotations
-
-2. **Graphiques Plotly** :
-   - Box plot prix comparables
-   - Scatter plot surface vs prix
-   - Bar chart scores composantes fiabilité
-
-### Tâche 5 : Export PDF (30 min)
-```python
-# Utiliser ReportLab pour générer PDF avec:
-├── Résumé bien (adresse, surface, type)
-├── Estimation (prix, fourchette, prix/m²)
-├── Fiabilité (score, composantes)
-├── Graphiques principaux
-└── Liste comparables (tableau)
-```
-
-### Tâche 6 : Tests Streamlit (30 min)
-```python
-# test_phase4_streamlit.py:
-├── Test geocoding Google Maps
-├── Test estimation flow complet
-├── Test affichage résultats
-└── Test export PDF
+**Optional Future Tables:**
+```sql
+CREATE TABLE estimations_historiques (
+  id UUID PRIMARY KEY,
+  user_id UUID,
+  bien_address VARCHAR,
+  prix_estime DECIMAL,
+  fiabilite DECIMAL,
+  created_at TIMESTAMP
+);
 ```
 
 ---
 
-## 🤖 ORCHESTRATION MULTI-MODELES
+## 🚀 PHASES DE MIGRATION
 
-```
-Tâche 1 (Layout) : Haiku (TOI)
-  → Structurer app.py, widgets Streamlit
+### PHASE 5: FINALISER STREAMLIT (Nov 8-22, 2025)
 
-Tâche 2 (Geocoding) : Haiku
-  → Wrapper Google Maps simple
+**Objectif:** Complete Phase 5 before migration
 
-Tâche 3 (Estimation) : Haiku
-  → Intégration EstimationAlgorithm
+**Tâches:**
+- [ ] Fix 17 failing tests (22/39 → 39/39)
+- [ ] UAT with internal team
+- [ ] Document for handoff
+- [ ] Validate all 5 user stories
 
-Tâche 4 (Visualisations) : Grok Code Fast 1
-  → Générer graphiques Folium/Plotly (économie ~50%)
-  → Boilerplate Folium/Plotly
-
-Tâche 5 (PDF Export) : Grok Code Fast 1
-  → Générer template ReportLab (boilerplate)
-
-Tâche 6 (Tests) : Grok Code Fast 1
-  → Générer 15+ tests Streamlit/PDF (économie ~60%)
-```
+**Timeline:** 2 weeks
 
 ---
 
-## 📊 TIMELINE PHASE 4
+### PHASE 6: BACKEND API EXTRACTION (Nov 25 - Dec 20, 2025)
 
-| Activité | Durée | Modèle | Notes |
-|----------|-------|--------|-------|
-| Tâche 1: Layout Streamlit | 30 min | Haiku | Structure de base |
-| Tâche 2: Geocoding Google Maps | 30 min | Haiku | Wrapper simple |
-| Tâche 3: Intégration Estimation | 45 min | Haiku | Flow complet |
-| Tâche 4: Visualisations Folium/Plotly | 60 min | Grok | Boilerplate graphiques |
-| Tâche 5: Export PDF ReportLab | 30 min | Grok | Template PDF |
-| Tâche 6: Tests Streamlit | 30 min | Grok | 15+ tests |
-| **TOTAL** | **3h45** | | |
+**Objectif:** Create FastAPI REST API, decouple backend
 
----
+**Tâches:**
+1. Setup FastAPI project (3 days)
+2. Extract Supabase logic (5 days)
+3. Extract Estimation logic (5 days)
+4. Extract Geocoding logic (3 days)
+5. Extract PDF generation (3 days)
+6. Configuration & testing (4 days)
+7. Deploy to Railway (2 days)
 
-## 🔐 CREDENTIALS NECESSAIRES
+**Livrables:**
+- ✅ FastAPI backend opérationnel (5 endpoints)
+- ✅ Swagger documentation
+- ✅ Deployed on Railway.app
+- ✅ 100% backend test coverage
 
-```
-.env
-├── SUPABASE_URL=https://fwcuftkjofoxyjbjzdnh.supabase.co
-├── SUPABASE_KEY=sbp_c56fb1e3ee2778583ab929550793aabaa9dc552a
-├── SUPABASE_DB_PASSWORD=tetrarchic-gazumping-lares-mercaptide
-└── GOOGLE_MAPS_API_KEY=AIzaSyBdwqhBKgOwi6kHejyhFFw8QluV4pkpwQE
-```
-
-Tous présents dans `.env` (Phase 2)
+**Timeline:** 3-4 weeks
 
 ---
 
-## 📋 CHECKLIST AVANT PHASE 4
+### PHASE 7: FRONTEND NEXT.JS (Dec 23 - Feb 14, 2026)
 
-**À vérifier demain matin** :
+**Objectif:** Build Next.js frontend
 
-- [ ] EstimationAlgorithm testé ✅ (Phase 3 complétée)
-- [ ] SupabaseDataRetriever opérationnel ✅ (Phase 2)
-- [ ] Google Maps API active ✅ (docs/GOOGLE_MAPS_SETUP.md)
-- [ ] `.env` credentials valides ✅
-- [ ] Streamlit installé (`pip install streamlit`)
-- [ ] Folium installé (`pip install folium`)
-- [ ] Plotly installé (`pip install plotly`)
-- [ ] ReportLab installé (`pip install reportlab`)
+**Tâches:**
+1. Setup Next.js project (3 days)
+2. Design & mockups Figma (5 days) - **Optional, can skip**
+3. Routing & layout (3 days)
+4. Form component (4 days)
+5. Dashboard component (4 days)
+6. Comparables table (3 days)
+7. Map component (3 days)
+8. PDF export (2 days)
+9. Integration & polish (5 days)
 
----
+**Livrables:**
+- ✅ Next.js frontend opérationnel
+- ✅ All 5 user stories implemented
+- ✅ Responsive design (mobile + desktop)
+- ✅ Deployed on Vercel
 
-## 🎯 COMMANDE PHASE 4
-
-Copie/colle dans **nouvelle conversation** (après avoir vérifié checklist) :
-
-```
-Phase 4: Interface Streamlit MVP pour estimations immobilières
-
-PRE-REQUIS FAITS :
-✅ EstimationAlgorithm complet et testé (33/33 tests)
-✅ SupabaseDataRetriever operationnel
-✅ Google Maps API configurée
-✅ Credentials .env valides
-✅ Streamlit/Folium/Plotly/ReportLab installes
-
-PHASE 4 - OBJECTIF :
-Creer interface Streamlit MVP pour estimation immobiliere Chablais/Annemasse
-
-TÂCHES :
-1. Créer app.py avec layout Streamlit
-2. Formulaire saisie (adresse, type, surface, pièces, caractéristiques)
-3. Géocodage Google Maps
-4. Intégration EstimationAlgorithm
-5. Affichage résultats (estimation, fourchette, fiabilité)
-6. Visualisations (Folium carte + Plotly graphiques)
-7. Export PDF (ReportLab)
-8. Tests Streamlit (15+ tests)
-
-ORCHESTRATION :
-- Haiku pour app.py, geocoding, estimation (logique métier)
-- Grok pour visualisations Folium/Plotly/PDF (boilerplate)
-- Grok pour tests Streamlit (économie coût ~60%)
-
-LIVRABLES ATTENDUS :
-- app.py (interface Streamlit principale)
-- src/utils/geocoding.py (wrapper Google Maps)
-- src/streamlit_components/ (composants réutilisables)
-- test_phase4_streamlit.py (15+ tests)
-- PHASE4_RECAP_COMPLET.md (documentation complète)
-- 5/5 tests passants sur flow estimation complet
-
-DURÉE : 3-4 heures
-```
+**Timeline:** 4-6 weeks
 
 ---
 
-## 📞 CONTACTS & RESSOURCES
+### PHASE 8: TESTING & VALIDATION (Feb 17-28, 2026)
 
-- **PRD Notion** : https://www.notion.so/Automatisation-des-estimations-2fc6cfd339504d1bbf444c0ae078ff5c
-- **Streamlit Docs** : https://docs.streamlit.io/
-- **Folium Docs** : https://python-visualization.github.io/folium/
-- **Plotly Docs** : https://plotly.com/python/
-- **ReportLab Docs** : https://www.reportlab.com/docs/
+**Objectif:** Comprehensive testing, no regressions
 
----
+**Tâches:**
+1. Unit tests (backend + frontend)
+2. Integration tests (API ↔ Frontend)
+3. E2E tests (Playwright)
+4. Performance testing (Lighthouse)
+5. Security audit
+6. User acceptance testing
 
-## 🎯 FIN DU GUIDE
+**Livrables:**
+- ✅ All tests passing
+- ✅ Performance targets met
+- ✅ UAT passed
 
-**Document créé** : 2025-10-22
-**À utiliser** : 2025-10-23 (demain, nouvelle conversation)
-**Context** : Nouvelle conversation = 100% context frais
-**Statut** : Phase 3 100% terminée et committée ✅
-
-### Pour demain :
-1. Lis ce guide START_PHASE4_DEMAIN.md
-2. Vérifie checklist (Streamlit/Folium/Plotly/ReportLab installés)
-3. Lance Phase 4 avec la commande fournie
-4. Profite de l'orchestration Haiku/Grok pour optimiser coût/vitesse ! 💚
+**Timeline:** 2 weeks
 
 ---
 
-**Statut Projet** : 🟡 **EN BONNE VOIE** - 60% complet (Phase 4 démarrage demain)
-- Phase 1-3: ✅ COMPLETE
-- Phase 4: ⏳ A FAIRE (Streamlit MVP)
-- Phase 5: ⏳ A FAIRE (Tests/validation)
+### PHASE 9: DEPLOYMENT & CUTOVER (Mar 2-16, 2026)
 
-**Prochaine étape** : Interface utilisateur Streamlit avec intégration EstimationAlgorithm
+**Objectif:** Production deployment, zero downtime migration
+
+**Tâches:**
+1. Production deployment (1 day)
+2. Monitoring setup (1 day)
+3. Soft launch (3 days - limited users)
+4. Full cutover (1 day)
+5. Post-launch monitoring (5 days)
+6. Streamlit deprecation (1 day)
+
+**Livrables:**
+- ✅ Production stable
+- ✅ Zero downtime cutover
+- ✅ Error rate < 1%
+- ✅ Streamlit deprecated
+
+**Timeline:** 2 weeks
+
+---
+
+## ⚠️ RISQUES & MITIGATIONS
+
+### Risk 1: Backend Breaking During Extraction
+
+**Likelihood:** Medium | **Impact:** High
+
+**Mitigation:**
+- Run old Streamlit + new FastAPI side-by-side
+- Compare outputs for identical inputs
+- Comprehensive pytest (100% coverage)
+
+**Rollback:** Keep Streamlit working, revert FastAPI if bug
+
+---
+
+### Risk 2: Performance Regression
+
+**Likelihood:** Low | **Impact:** Medium
+
+**Mitigation:**
+- Lighthouse benchmarks (target: 90+)
+- React Query caching
+- Code splitting + lazy loading
+
+---
+
+### Risk 3: Extended Timeline
+
+**Likelihood:** High | **Impact:** Medium
+
+**Mitigation:**
+- Use component libraries (shadcn/ui saves 40% time)
+- Weekly sprint reviews
+- Prioritize MVP features
+
+**Contingency:** Defer nice-to-haves (PDF export → Phase 10)
+
+---
+
+### Risk 4: Data Loss
+
+**Likelihood:** Very Low | **Impact:** Catastrophic
+
+**Mitigation:**
+- Supabase auto-backups enabled
+- Keep Streamlit running 2 weeks post-launch
+- No data modifications during migration
+
+---
+
+### Risk 5: User Adoption
+
+**Likelihood:** Low | **Impact:** Medium
+
+**Mitigation:**
+- Keep similar UX to Streamlit
+- Video tutorial (5 min)
+- In-app help tooltips
+- Email announcement
+
+---
+
+## 💼 COST BREAKDOWN (Annual)
+
+| Component | Cost | Notes |
+|-----------|------|-------|
+| **Vercel** | EUR 0 | Free tier (Pro: EUR 200/year if needed) |
+| **Railway** | EUR 60 | EUR 5/month for backend |
+| **Supabase** | EUR 0-100 | Included or pay-as-you-grow |
+| **Google Maps** | EUR 50-100 | ~$5 per 1000 requests |
+| **Sentry** | EUR 0 | Free tier (10k events/mo) |
+| **TOTAL** | **EUR 110-260/year** | Very affordable |
+
+---
+
+## ❓ QUESTIONS OUVERTES
+
+1. **Figma Design Phase**
+   - Créer mockups Figma toi-même?
+   - Ou fournir wireframes?
+   - Ou coder directement (plus rapide)?
+
+2. **Domain & Deployment**
+   - Nom de domaine décidé?
+   - Frontend URL?
+   - Backend URL?
+
+3. **Timeline**
+   - 14 weeks acceptable?
+   - Hard deadline?
+
+4. **Scope**
+   - Retirer features de Streamlit?
+   - Ajouter nouvelles features?
+
+5. **Team & Support**
+   - Solo dev (toi) + Claude Code?
+   - Autre dev disponible?
+
+6. **Authentication**
+   - MVP sans auth?
+   - Ou JWT from start?
+
+7. **Monitoring**
+   - Sentry pour errors?
+   - Custom analytics?
+
+---
+
+## ✅ PROCHAINES ÉTAPES
+
+### Cette Semaine
+1. ✅ Review stratégie
+2. ⏳ Clarifier questions ouvertes
+3. ⏳ Finaliser Phase 5
+
+### Prochaine Semaine
+1. ⏳ Phase 6 skeleton (FastAPI)
+2. ⏳ Setup Railway account
+3. ⏳ Complete Streamlit MVP + UAT
+
+### Décembre - Février
+1. ⏳ Phase 6-7 execution
+2. ⏳ Parallel development
+
+### Mars
+1. ⏳ Phase 8-9 execution
+2. ⏳ Production launch
+
+---
+
+**Status:** PRÊT POUR REVIEW & CLARIFICATIONS ✅
+
